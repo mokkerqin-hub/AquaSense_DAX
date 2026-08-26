@@ -42,12 +42,28 @@ st.markdown("""
      both. Only the accent is an explicit value, chosen to clear contrast
      on both backgrounds (4.01 on white, 4.71 on dark).
      ------------------------------------------------------------------ */
+  /* ------------------------------------------------------------------
+     Type system — exactly two families throughout.
+       DISPLAY  : headings, metric numbers, eyebrows, control names
+       TEXT     : body copy, questions, readouts, tables, chart labels
+     Both are common system stacks, so nothing depends on a web font
+     loading before the app renders.
+     ------------------------------------------------------------------ */
   :root {
       --aq-accent:#158AA8;
       --aq-line: rgba(130,142,150,.38);
+      --aq-panel: rgba(130,142,150,.09);
+      --aq-display: "Trebuchet MS", "Segoe UI", "Helvetica Neue", sans-serif;
+      --aq-text: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
   }
 
-  h1, h2, h3, h4 { color: var(--aq-accent) !important; letter-spacing:-0.02em; }
+  html, body, .stApp, [class*="css"] { font-family: var(--aq-text); }
+
+  h1, h2, h3, h4 {
+      font-family: var(--aq-display);
+      color: var(--aq-accent) !important;
+      letter-spacing:-0.02em;
+  }
 
   /* ---------- headline metric strip ---------- */
   .metric-strip {
@@ -58,39 +74,95 @@ st.markdown("""
   }
   .metric-cell { flex:1; padding:.9rem 1.2rem .9rem 0; }
   .metric-val {
+      font-family: var(--aq-display);
       font-size:1.85rem; font-weight:700; color:var(--aq-accent);
       line-height:1.1; font-variant-numeric:tabular-nums;
   }
   .metric-lab {
+      font-family: var(--aq-text);
       font-size:.72rem; text-transform:uppercase; letter-spacing:.09em;
       color:inherit; opacity:.72; margin-top:.25rem;
   }
 
   .eyebrow {
+      font-family: var(--aq-display);
       font-size:.72rem; text-transform:uppercase; letter-spacing:.14em;
       color:var(--aq-accent); font-weight:700;
   }
-  .note { font-size:.86rem; color:inherit; line-height:1.55; }
+  .note {
+      font-family: var(--aq-text);
+      font-size:.86rem; color:inherit; line-height:1.55;
+  }
+
+  /* Subtitle: fills the available width, then wraps cleanly.
+     `nowrap` was truncating with an ellipsis and losing the sentence end,
+     so it wraps instead, with balanced line lengths and no orphan word. */
+  .subtitle-oneline {
+      font-size:.86rem;
+      margin-top:-.6rem;
+      max-width: 100%;
+      text-wrap: balance;
+      overflow-wrap: break-word;
+  }
+
+  /* ---------- sidebar panel ---------- */
+  .aq-panel {
+      background: var(--aq-panel);
+      border: 1px solid var(--aq-line);
+      border-radius: 10px;
+      padding: .85rem .9rem .1rem .9rem;
+      margin-bottom: 1.1rem;
+  }
+  .aq-panel .eyebrow { display:block; margin-bottom:.4rem; }
 
   /* ---------- sidebar control blocks ---------- */
   .ctrl-name {
+      font-family: var(--aq-display);
       font-size:.88rem; font-weight:700; color:var(--aq-accent);
       margin-bottom:.1rem;
   }
   .ctrl-q {
+      font-family: var(--aq-text);
       font-size:.79rem; font-style:italic;
       color:inherit; opacity:.75;
       line-height:1.4; margin-bottom:.35rem;
   }
   .ctrl-read {
+      font-family: var(--aq-text);
       font-size:.76rem; color:inherit; opacity:.88;
-      margin-top:-.5rem; margin-bottom:1.4rem;
+      line-height:1.45;
+      margin-top:-.5rem; margin-bottom:1.5rem;
   }
 
   [data-testid="stSidebar"] { border-right:1px solid var(--aq-line); }
 
+  /* Scope the font to TEXT elements only. A blanket `*` here also hits
+     Streamlit's Material Symbols icons, whose glyphs are ligatures —
+     overriding their font makes the collapse arrow render as the literal
+     string "keyboard_double_arrow_left". */
+  [data-testid="stSidebar"] p,
+  [data-testid="stSidebar"] label,
+  [data-testid="stSidebar"] span:not([class*="material"]):not([class*="Icon"]),
+  [data-testid="stSidebar"] div.stMarkdown,
+  [data-testid="stSidebar"] .ctrl-q,
+  [data-testid="stSidebar"] .ctrl-read { font-family: var(--aq-text); }
+
+  [data-testid="stSidebar"] .ctrl-name,
+  [data-testid="stSidebar"] .eyebrow { font-family: var(--aq-display); }
+
+  /* Never let the type system touch icon glyphs, anywhere in the app. */
+  [data-testid="stIconMaterial"],
+  span[class*="material-symbols"],
+  span[class*="MaterialIcon"],
+  [data-testid="stSidebarCollapseButton"] *,
+  [data-testid="stExpanderToggleIcon"] {
+      font-family: "Material Symbols Rounded", "Material Symbols Outlined",
+                   "Material Icons" !important;
+  }
+
   [data-testid="stDataFrame"] {
       border:1px solid var(--aq-line); border-radius:8px;
+      font-family: var(--aq-text);
   }
   hr.aq {
       border:0; border-top:1px solid var(--aq-line);
@@ -106,6 +178,7 @@ st.markdown("""
       fill: currentColor !important;
   }
   .js-plotly-plot, .js-plotly-plot .plot-container { color: inherit; }
+  .js-plotly-plot text { font-family: var(--aq-text) !important; }
 </style>""", unsafe_allow_html=True)
 
 
@@ -133,9 +206,9 @@ st.markdown('<div class="eyebrow">Pahang · 74 treatment plants · 2023–2025</
             unsafe_allow_html=True)
 st.title("AquaSense")
 st.markdown(
-    '<p class="note" style="max-width:62ch;margin-top:-.6rem">'
-    'A decision support tool for ranking which water treatment plants '
-    'to repair first, based on the water they could actually recover.'
+    '<p class="note subtitle-oneline">'
+    'A decision support tool for ranking which water treatment plants to '
+    'repair first, based on the water they could actually recover.'
     '</p>', unsafe_allow_html=True)
 
 
@@ -147,43 +220,90 @@ def control_header(name, question):
                 f'<div class="ctrl-q">{question}</div>',
                 unsafe_allow_html=True)
 
-def control_readout(text):
-    st.markdown(f'<div class="ctrl-read">{text}</div>', unsafe_allow_html=True)
+def control_readout(html):
+    """Readout may contain simple inline HTML (<b>, <br>)."""
+    st.markdown(f'<div class="ctrl-read">{html}</div>', unsafe_allow_html=True)
 
 
 with st.sidebar:
-    st.markdown('<div class="eyebrow">Set your priorities</div>',
-                unsafe_allow_html=True)
-    st.write("")
+    st.markdown(
+        '<div class="aq-panel">'
+        '<span class="eyebrow">Set your priorities</span>'
+        '<p class="note" style="opacity:.82;font-size:.79rem">'
+        'These four settings define a repair plan. The first two decide '
+        '<b>which</b> plants are queued. The last two decide <b>how much</b> '
+        'water that plan recovers.</p>'
+        '</div>', unsafe_allow_html=True)
 
+    # ---- 1. volume vs ease -------------------------------------
     control_header("Water or speed",
-                   "Do you want the most water, or the quickest fix?")
-    W = st.slider("Water or speed", 0.0, 1.0, 0.70, 0.05,
-                  label_visibility="collapsed")
-    control_readout(f"{W:.0%} weight on volume · {1-W:.0%} on ease of repair")
+                   "Do you want the most water or the quickest fix?")
+    W = st.slider(
+        "Water or speed", 0.0, 1.0, 0.70, 0.05,
+        label_visibility="collapsed",
+        help="At 1.0 the queue is ranked purely by how much water each plant "
+             "could recover, so the largest plants dominate. At 0.0 it ranks "
+             "purely by ease of repair, favouring small plants with "
+             "concentrated, findable bursts. The default of 0.70 keeps the "
+             "queue volume-led while still letting repair difficulty move "
+             "plants up or down.")
+    control_readout(
+        f"<b>{W:.0%}</b> weight on recoverable volume<br> "
+        f"<b>{1-W:.0%}</b> on ease of repair<br>"
+        + ("Volume-led — favours the largest leaks" if W >= 0.65 else
+           "Balanced — volume and difficulty carry similar weight"
+           if W >= 0.45 else
+           "Ease-led — favours small, quick repairs"))
 
+    # ---- 2. community need -------------------------------------
     control_header("Community need",
                    "Should districts that struggle most with a water cut go first?")
-    ALPHA = st.slider("Community need", 0.0, 1.0, 0.00, 0.05,
-                      label_visibility="collapsed")
-    control_readout("Engineering only — every cubic metre counts equally"
-                    if ALPHA == 0 else
-                    "Plants in higher-need districts move up the queue")
+    ALPHA = st.slider(
+        "Community need", 0.0, 1.0, 0.00, 0.05,
+        label_visibility="collapsed",
+        help="Applies the District Vulnerability Index, built from 2024 DOSM "
+             "relative poverty and median household income. At 0 the queue is "
+             "purely engineering — a cubic metre counts the same wherever it "
+             "is lost. Raising it moves plants in higher-need districts up. "
+             "Note this reduces total water recovered: it is a deliberate "
+             "trade-off, not a free improvement.")
+    control_readout(
+        "No social weighting — ranked on water and repair effort alone"
+        if ALPHA == 0 else
+        f"Plants in higher-need districts move up<br>"
+        f"Highest need: Bera, Jerantut<br>"
+        f"Lowest need: Cameron Highlands ")
 
+    # ---- 3. crew capacity --------------------------------------
     st.markdown('<div class="eyebrow">Dispatch plan</div>',
                 unsafe_allow_html=True)
     st.write("")
 
     control_header("Crew capacity",
                    "How many plants can you send crews to repair?")
-    N = st.slider("Crew capacity", 1, 30, 10, label_visibility="collapsed")
-    control_readout(f"Top {N} plants from the queue below")
+    N = st.slider(
+        "Crew capacity", 1, 30, 10, label_visibility="collapsed",
+        help="How many plants the plan covers, taken from the top of the "
+             "queue. This does not change the ranking — only how far down "
+             "it you commit resources.")
+    control_readout(f"Top <b>{N}</b> of 74 plants")
 
+    # ---- 4. recovery rate --------------------------------------
     control_header("Repair effectiveness",
                    "How much of a plant's leakage does a repair actually stop?")
-    RECOVERY = st.slider("Repair effectiveness", 0.1, 1.0, 0.40, 0.05,
-                         label_visibility="collapsed")
-    control_readout(f"Assumes {RECOVERY:.0%} of physical loss is recovered")
+    RECOVERY = st.slider(
+        "Repair effectiveness", 0.1, 1.0, 0.40, 0.05,
+        label_visibility="collapsed",
+        help="No repair eliminates all leakage at a plant — some always "
+             "remains in unfound or inaccessible sections. This assumption "
+             "affects only the 2030 projection, not the ranking. It is "
+             "exposed rather than fixed because no repair-outcome data "
+             "exists to estimate it from.")
+    control_readout(
+        f"Assumes <b>{RECOVERY:.0%}</b> of physical loss is recovered<br>"
+        + ("Conservative" if RECOVERY <= 0.35 else
+           "Moderate" if RECOVERY <= 0.6 else
+           "Optimistic — few repair programmes achieve this"))
 
 
 # ---------------------------------------------------------------
@@ -226,16 +346,35 @@ st.subheader("Repair queue")
 show = selected[["Plant_Name", "District", "annual_recoverable",
                  "nrw_pct", "PRI", "moved"]].copy()
 show.insert(0, "#", range(1, len(show) + 1))
-show["annual_recoverable"] = (show.annual_recoverable / 1e6).round(2)
-show["nrw_pct"] = show.nrw_pct.round(1)
-show["PRI"] = show.PRI.round(1)
+show["annual_recoverable"] = show.annual_recoverable / 1e6
 show["moved"] = show.moved.apply(
     lambda m: "—" if m == 0 else (f"▲{m}" if m > 0 else f"▼{abs(m)}"))
 show.columns = ["#", "Plant", "District", "Recoverable Mm³",
                 "Loss %", "Score", "Moved"]
 
-st.dataframe(show, hide_index=True, use_container_width=True,
-             height=min(36 * len(show) + 40, 700))
+# Explicit display formats — rounding the values is not enough, since
+# Streamlit trims trailing zeros (2.50 would render as 2.5).
+st.dataframe(
+    show, hide_index=True, use_container_width=True,
+    height=min(36 * len(show) + 40, 700),
+    column_config={
+        "#": st.column_config.NumberColumn(width="small"),
+        "Recoverable Mm³": st.column_config.NumberColumn(
+            format="%.2f", help="Physical leakage recoverable per year"),
+        "Loss %": st.column_config.NumberColumn(
+            format="%.1f", help="Non-revenue water as a share of production"),
+        "Score": st.column_config.NumberColumn(
+            format="%.1f", help="Priority score — higher is more urgent"),
+        "Moved": st.column_config.TextColumn(
+            width="small",
+            help="Rank change once community need is applied"),
+    })
+
+st.markdown(
+    '<p class="note" style="opacity:.78;margin-top:-.2rem">'
+    'Ranked by recoverable water and ease of repair, then adjusted for '
+    'community need. Loss % is shown for reference only — it does not '
+    'affect the ranking.</p>', unsafe_allow_html=True)
 
 st.download_button("Download this queue",
                    selected.to_csv(index=False),
@@ -316,7 +455,7 @@ with st.expander("How the score works"):
 **Recoverable Water**
 
 This only includes actual physical leaks. Issues like inaccurate meters or
-billing mistakes are excluded, because fixing them requires a metering
+billing mistakes are excluded because fixing them requires a metering
 programme, not a repair crew.
 
 **Ease of Repair**
@@ -324,15 +463,15 @@ programme, not a repair crew.
 This is an overall score based on pipe length, plant age, and how clustered
 the leaks are. Plants with frequent, concentrated bursts have leaks that are
 easier to locate, while slow leaks spread across long rural networks are much
-harder to find. No actual repair cost data is available, so this structural
+harder to find. No actual repair cost data is available so this structural
 score is used instead.
 
 **Why Percentile Ranks Are Used**
 
-Raw numbers aren't combined directly. Recoverable water varies about 163× across the 
+Raw numbers are not combined directly. Recoverable water varies about 163× across the 
 74 plants, while repair difficulty varies only about 5×. Combining raw values lets scale 
 differences decide the ranking rather than the weighting you choose. Converting both 
-into percentile ranks puts them on the same footing, so the slider can actually shift the 
+into percentile ranks puts them on the same footing so the slider can actually shift the 
 balance between them.
 
 **District Hardship**
@@ -346,6 +485,6 @@ supply disruption.
 
 This assumes repairs are completed gradually over 24 months rather than all at
 once. The forecast uses a damped Holt model fitted on 36 months of data. Treat
-it as a general trend rather than an exact point estimate, since predictions
+it as a general trend rather than an exact point estimate since predictions
 get less precise the further ahead they run.
 """)
