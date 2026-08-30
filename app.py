@@ -286,7 +286,9 @@ with st.sidebar:
         help="How many plants the plan covers, taken from the top of the "
              "queue. This does not change the ranking — only how far down "
              "it you commit resources.")
-    control_readout(f"Top <b>{N}</b> of 74 plants")
+    control_readout(
+    f"Top <b>{N}</b> of 74 plants<br>"
+    f"<span style='opacity:.8'>Assumed repaired over 24 months</span>")
 
     # ---- 4. recovery rate --------------------------------------
     control_header("Repair effectiveness",
