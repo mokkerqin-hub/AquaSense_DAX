@@ -64,7 +64,7 @@ streamlit run app.py
 
 ## Limitations
 
-Difficulty is a structural proxy, not repair cost. DVI is district-level, so all plants in a district share one weighting. Recovery is modelled as a single programme phased over an assumed 24 months rather than a rolling annual schedule — this shapes the intermediate trajectory but not the 2030 endpoint. The forecast is 36 months extrapolated 60, so read 2030 values as trajectory, not point estimates.
+Difficulty is a structural proxy, not repair cost. DVI is district-level, so all plants in a district share one weighting. Recovery is modelled as a single programme phased over an assumed 24 months rather than a rolling annual schedule. This shapes the intermediate trajectory but not the 2030 endpoint. The forecast is 36 months extrapolated 60, so read 2030 values as trajectory, not point estimates.
 
 ## Data
 
